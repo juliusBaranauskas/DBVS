@@ -180,10 +180,14 @@ public class photoRENT {
         System.out.println("Please enter your email address: ");
 
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-        mail = bufferedReader.readLine();
-        System.out.println("Please enter your phone number: ");
-
-        phone = bufferedReader.readLine();
+		try{
+			mail = bufferedReader.readLine();
+			System.out.println("Please enter your phone number: ");
+			phone = bufferedReader.readLine();
+		}
+		catch(IOException e){
+			System.out.println("Please enter your phone number: ");
+		}
         return getId(postGresConn, mail, phone);
     }
 
