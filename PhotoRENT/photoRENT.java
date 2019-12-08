@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.io.*;
 import java.util.Scanner;
+import java.util.Date.*;
+import java.sql.Date.*;
 
 public class photoRENT {
 
@@ -77,7 +79,6 @@ public class photoRENT {
 
     public static void viewAvailableCameras(Connection postGresConn)
     {
-
         if(postGresConn == null) {
             System.out.println("We should never get here.");
             return;
@@ -90,6 +91,75 @@ public class photoRENT {
             rs = stmt.executeQuery("SELECT Name, 2 from juba5766.Available_cameras");
             while (rs.next()){
                 System.out.println(rs.getString("Name") + "\t|\t" + rs.getInt(2));
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("SQL Error!");
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if(null != rs)
+                    rs.close() ;
+                if(null != stmt)
+                    stmt.close() ;
+            }
+            catch (SQLException exp) {
+                System.out.println("Unexpected SQL Error!");
+                exp.printStackTrace();
+            }
+        }
+    }
+
+    public static void viewAvailableLenses(Connection postGresConn)
+    {
+        if(postGresConn == null) {
+            System.out.println("We should never get here.");
+            return;
+        }
+
+        Statement stmt = null ;
+        ResultSet rs = null ;
+        try {
+            stmt = postGresConn.createStatement();
+            rs = stmt.executeQuery("SELECT Name, 2 from juba5766.Available_lenses");
+            while (rs.next()){
+                System.out.println(rs.getString("Name") + "\t|\t" + rs.getInt(2));
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("SQL Error!");
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if(null != rs)
+                    rs.close() ;
+                if(null != stmt)
+                    stmt.close() ;
+            }
+            catch (SQLException exp) {
+                System.out.println("Unexpected SQL Error!");
+                exp.printStackTrace();
+            }
+        }
+    }
+
+    public static void viewItemsTakenBy(Connection postGresConn, int id)
+    {
+        if(postGresConn == null) {
+            System.out.println("We should never get here.");
+            return;
+        }
+
+        Statement stmt = null ;
+        ResultSet rs = null ;
+        try {
+            stmt = postGresConn.createStatement();
+            rs = stmt.executeQuery("SELECT Serial_number, Name, Date_taken, Return_date FROM juba5766.Taken_cameras WHERE Customer = "+ id +
+                    " UNION SELECT Serial_number, Name, Date_taken, Return_date FROM juba5766.Taken_lenses WHERE Customer = "+ id );
+            while (rs.next()){
+                System.out.println(rs.getInt("Serial_number") + "\t|\t" + rs.getString("Name") + rs.getDate("Date_taken") + "\t|\t" + rs.getDate("Return_date"));
             }
         }
         catch (SQLException e) {
@@ -199,8 +269,8 @@ public class photoRENT {
             return -1;
         }
 
-        Statement stmt = null ;
-        ResultSet rs = null ;
+        Statement stmt = null;
+        ResultSet rs = null;
         try {
             stmt = postGresConn.createStatement();
             rs = stmt.executeQuery("SELECT Id FROM juba5766.Customer WHERE Email = '" + email + "' AND Phone_number = '" + phone + "' ");
@@ -241,10 +311,10 @@ public class photoRENT {
                     viewAvailableCameras(con);
                     break;
                 case 2:
-                    //viewAvailableLenses();
+                    viewAvailableLenses(con);
                     break;
                 case 3:
-                    //viewItemsTakenBy();
+                    viewItemsTakenBy(con, customerId);
             }
         }else{
             askEmployee();
