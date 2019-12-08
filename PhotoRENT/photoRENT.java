@@ -12,6 +12,22 @@ public class photoRENT {
 
     static Scanner scanner = new Scanner(System.in);
 
+    enum CustomerActions{
+        AVAILABLE_CAMERAS,
+        AVAILABLE_LENSES,
+        ITEMS_TAKEN_BY,
+        CAMERA_INFO,
+        LENS_INFO
+    }
+
+    enum EmployeeActions{
+        AVAILABLE_CAMERAS,
+        AVAILABLE_LENSES,
+        TAKEN_ITEMS,
+        CAMERA_INFO,
+        LENS_INFO
+    }
+
     /********************************************************/
     public static void loadDriver()
     {
@@ -185,19 +201,19 @@ public class photoRENT {
         System.out.println("Enter 1 to view cameras available for rent");
         System.out.println("Enter 2 to view lenses available for rent");
         System.out.println("Enter 3 to see your taken items");
-        System.out.println("Enter 4 to view information about specific item");
+        System.out.println("Enter 4 to view information about specific camera");
         System.out.println("Enter 5 to ");
         System.out.println("Enter 6 to ");
         System.out.println("Enter 1 to ");
 
         switch (scanner.nextInt()){
-            case 1:
+            case CustomerActions.AVAILABLE_CAMERAS:
                 return 1; // Enum.viewCameras
-            case 2:
+            case CustomerActions.AVAILABLE_LENSES:
                 return 2;
-            case 3:
+            case CustomerActions.ITEMS_TAKEN_BY:
                 return 3;
-            case 4:
+            case CustomerActions.CAMERA_INFO:
                 return 4;
             default:
                 System.out.println("Wrong key entered, try again");
@@ -215,17 +231,17 @@ public class photoRENT {
         System.out.println("Enter 7 to register new camera");
 
         switch (scanner.nextInt()){
-            case 1:
+            case EmployeeActions.AVAILABLE_CAMERAS:
                 return 1; // Enum.viewCameras
-            case 2:
+            case EmployeeActions.AVAILABLE_LENSES:
                 return 2;
-            case 3:
+            case EmployeeActions.ITEMS_TAKEN_BY:
                 return 3;
-            case 4:
+            case EmployeeActions.CAMERA_INFO:
                 return 4;
             default:
                 System.out.println("Wrong key entered, try again");
-                return askEmployee();
+                return askCustomer();
         }
     }
 
@@ -246,11 +262,13 @@ public class photoRENT {
 
     static int getCustomerId(Connection postGresConn)
     {
-        String mail = "", phone = "";
+        String mail = "",
+                phone = "";
         System.out.println("Please enter your email address: ");
 
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-		try{
+		try
+        {
 			mail = bufferedReader.readLine();
 			System.out.println("Please enter your phone number: ");
 			phone = bufferedReader.readLine();
@@ -258,6 +276,7 @@ public class photoRENT {
 		catch(IOException e){
 			System.out.println("Please enter your phone number: ");
 		}
+
         return getId(postGresConn, mail, phone);
     }
 
@@ -271,7 +290,8 @@ public class photoRENT {
 
         Statement stmt = null;
         ResultSet rs = null;
-        try {
+        try
+        {
             stmt = postGresConn.createStatement();
             rs = stmt.executeQuery("SELECT Id FROM juba5766.Customer WHERE Email = '" + email + "' AND Phone_number = '" + phone + "' ");
             while (rs.next()){
@@ -304,17 +324,24 @@ public class photoRENT {
         Connection con = getConnection(args[0], args[1]);
         boolean isCustomer = askForType();
         int customerId = -1;
+
         if(isCustomer){
             customerId = getCustomerId(con);
             switch (askCustomer()){
-                case 1:
+                case CustomerActions.AVAILABLE_CAMERAS:
                     viewAvailableCameras(con);
                     break;
-                case 2:
+                case CustomerActions.AVAILABLE_LENSES:
                     viewAvailableLenses(con);
                     break;
-                case 3:
+                case CustomerActions.ITEMS_TAKEN_BY:
                     viewItemsTakenBy(con, customerId);
+                    break;
+                case CustomerActions.CAMERA_INFO:
+                    //viewCameraInfo(con, askCameraName());
+                    break;
+                default:
+                    break;
             }
         }else{
             askEmployee();
