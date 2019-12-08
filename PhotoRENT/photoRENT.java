@@ -21,7 +21,8 @@ public class photoRENT {
         }
     }
     /********************************************************/
-    public static Connection getConnection(String conSetting, String conValidator) {
+    public static Connection getConnection(String conSetting, String conValidator)
+    {
         Connection postGresConn = null;
         try {
             postGresConn = DriverManager.getConnection("jdbc:postgresql://pgsql3.mif/studentu", conValidator, conSetting) ;
@@ -158,10 +159,12 @@ public class photoRENT {
         }
     }
 
-    static boolean askForType(){
+    static boolean askForType()
+    {
         System.out.println("Enter 1 to enter Customer menu\nEnter 2 to enter Employee menu");
         Scanner s = new Scanner(System.in);
         int choice = s.nextInt();
+
         if(choice == 1){
             return true;
         }else if (choice == 2){
@@ -172,7 +175,8 @@ public class photoRENT {
         }
     }
 
-    static int getCustomerId(Connection postGresConn){
+    static int getCustomerId(Connection postGresConn)
+    {
         String mail = "", phone = "";
         System.out.println("Please enter your email address: ");
         try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in))){
@@ -187,7 +191,8 @@ public class photoRENT {
     }
 
 
-    static int getId(Connection postGresConn, String email, String phone){
+    static int getId(Connection postGresConn, String email, String phone)
+    {
         if(postGresConn == null) {
             System.out.println("We should never get here.");
             return -1;
@@ -197,7 +202,7 @@ public class photoRENT {
         ResultSet rs = null ;
         try {
             stmt = postGresConn.createStatement();
-            rs = stmt.executeQuery("SELECT Id FROM juba5766.Customer WHERE Email = " + "'"+email +"'"+ " AND Phone_number = cast(" + phone +"AS INT)");
+            rs = stmt.executeQuery("SELECT Id FROM juba5766.Customer WHERE Email = " + email + " AND Phone_number = " + phone + " ");
             while (rs.next()){
                 System.out.println(rs.getInt("Id"));
             }
