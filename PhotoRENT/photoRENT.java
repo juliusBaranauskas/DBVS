@@ -138,16 +138,39 @@ public class photoRENT {
         }
     }
 
+    int getCustomerId(){
+        System.out.println("Please enter your email address: ");
+        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in))){
+            string mail = bufferedReader.readLine();
+            for (char a: mail) {
+                System.out.println(a);
+            }
+        }
+
+        return -1;
+    }
+
     /********************************************************/
     public static void main(String[] args)
     {
         loadDriver();
         Connection con = getConnection(args[0], args[1]);
         boolean isCustomer = askForType();
+        int customerId = -1;
         if(isCustomer){
-
+            customerId = getCustomerId();
+            switch (askCustomer()){
+                case 1:
+                    viewAvailableCameras();
+                    break;
+                case 2:
+                    viewAvailableLenses();
+                    break;
+                case 3:
+                    viewItemsTakenBy();
+            }
         }else{
-
+            askEmployee();
         }
         if( null != con ) {
             int nofBooks = countBooks(con);
