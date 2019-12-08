@@ -8,6 +8,8 @@ import java.util.Scanner;
 
 public class photoRENT {
 
+    static Scanner scanner = new Scanner(System.in);
+
     /********************************************************/
     public static void loadDriver()
     {
@@ -118,8 +120,7 @@ public class photoRENT {
         System.out.println("Enter 6 to ");
         System.out.println("Enter 1 to ");
 
-        Scanner s = new Scanner(System.in);
-        switch (s.nextInt()){
+        switch (scanner.nextInt()){
             case 1:
                 return 1; // Enum.viewCameras
             case 2:
@@ -143,8 +144,7 @@ public class photoRENT {
         System.out.println("Enter 6 to register new item");
         System.out.println("Enter 7 to register new camera");
 
-        Scanner s = new Scanner(System.in);
-        switch (s.nextInt()){
+        switch (scanner.nextInt()){
             case 1:
                 return 1; // Enum.viewCameras
             case 2:
@@ -162,8 +162,7 @@ public class photoRENT {
     static boolean askForType()
     {
         System.out.println("Enter 1 to enter Customer menu\nEnter 2 to enter Employee menu");
-        Scanner s = new Scanner(System.in);
-        int choice = s.nextInt();
+        int choice = scanner.nextInt();
 
         if(choice == 1){
             return true;
@@ -179,14 +178,12 @@ public class photoRENT {
     {
         String mail = "", phone = "";
         System.out.println("Please enter your email address: ");
-        try(BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in))){
-            mail = bufferedReader.readLine();
-            System.out.println("Please enter your phone number: ");
-            phone = bufferedReader.readLine();
-        }
-        catch(Exception e){
-            System.out.println(e);
-        }
+
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        mail = bufferedReader.readLine();
+        System.out.println("Please enter your phone number: ");
+
+        phone = bufferedReader.readLine();
         return getId(postGresConn, mail, phone);
     }
 
@@ -202,7 +199,7 @@ public class photoRENT {
         ResultSet rs = null ;
         try {
             stmt = postGresConn.createStatement();
-            rs = stmt.executeQuery("SELECT Id FROM juba5766.Customer WHERE Email = " + email + " AND Phone_number = " + phone + " ");
+            rs = stmt.executeQuery("SELECT Id FROM juba5766.Customer WHERE Email = '" + email + "' AND Phone_number = '" + phone + "' ");
             while (rs.next()){
                 System.out.println(rs.getInt("Id"));
             }
