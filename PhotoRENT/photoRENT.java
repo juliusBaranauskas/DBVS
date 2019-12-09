@@ -197,6 +197,36 @@ public class photoRENT {
         }
     }
 
+    public static void setItemReturned(Connection postGresConn, Date date_returned, int rent_num)
+    {
+        if(postGresConn == null) {
+            System.out.println("We should never get here.");
+            return;
+        }
+
+        Statement stmt = null ;
+        ResultSet rs = null ;
+        try {
+            stmt = postGresConn.createStatement();
+            rs = stmt.executeQuery("UPDATE juba5766.Rent SET Date_returned = '" + date +"' WHERE Rent_number = " + rent_num);
+        }
+        catch (SQLException e) {
+            System.out.println("SQL Error!");
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if(null != rs)
+                    rs.close() ;
+                if(null != stmt)
+                    stmt.close() ;
+            }
+            catch (SQLException exp) {
+                System.out.println("Unexpected SQL Error!");
+                exp.printStackTrace();
+            }
+        }
+    }
 
     public static void viewAvailableCameras(Connection postGresConn)
     {
