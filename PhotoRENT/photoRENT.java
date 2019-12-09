@@ -8,12 +8,13 @@ import java.util.Scanner;
 import java.util.Date.*;
 import java.sql.Date.*;
 
+
 public class photoRENT {
 
     static Scanner scanner = new Scanner(System.in);
 
     enum CustomerActions{
-        AVAILABLE_CAMERAS = 1,
+        AVAILABLE_CAMERAS,
         AVAILABLE_LENSES,
         ITEMS_TAKEN_BY,
         CAMERA_INFO,
@@ -21,16 +22,16 @@ public class photoRENT {
     }
 
     enum EmployeeActions{
-        AVAILABLE_CAMERAS = 1,
+        AVAILABLE_CAMERAS,
         AVAILABLE_LENSES,
         TAKEN_ITEMS,
         CAMERA_INFO,
         REGISTER_CUSTOMER,
         REGISTER_CAMERA,
         REGISTER_LENS,
-        REMOVE_CUSTOMER,
         REMOVE_ITEM,
-        REGISTER_RENT
+        REGISTER_RENT,
+        SEARCH_CAMERA
 
     }
 
@@ -107,10 +108,9 @@ public class photoRENT {
         }
 
         Statement stmt = null ;
-        ResultSet rs = null ;
         try {
             stmt = postGresConn.createStatement();
-            rs = stmt.executeQuery("INSERT INTO juba5766.Customer(First_name, Last_name, Email, Phone_number)" +
+            stmt.executeUpdate("INSERT INTO juba5766.Customer(First_name, Last_name, Email, Phone_number) " +
                     "VALUES ('"+ customer.First_name +"', '"+ customer.Last_name +"', '"+ customer.Email +"', '"+ customer.Phone_number +"')");
         }
         catch (SQLException e) {
@@ -119,8 +119,6 @@ public class photoRENT {
         }
         finally {
             try {
-                if(null != rs)
-                    rs.close() ;
                 if(null != stmt)
                     stmt.close() ;
             }
@@ -131,8 +129,35 @@ public class photoRENT {
         }
     }
 
-    public static void removeItem(Connection postGresConn, int itemId)
+    public static void removeItem(Connection postGresConn, String itemId)
     {
+        if(postGresConn == null) {
+            System.out.println("We should never get here.");
+            return;
+        }
+
+        Statement stmt = null ;
+        try {
+            stmt = postGresConn.createStatement();
+            stmt.executeUpdate("DELETE FROM juba5766.Rentable_item WHERE Id = " + itemId);
+        }
+        catch (SQLException e) {
+            System.out.println("SQL Error!");
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if(null != stmt)
+                    stmt.close() ;
+            }
+            catch (SQLException exp) {
+                System.out.println("Unexpected SQL Error!");
+                exp.printStackTrace();
+            }
+        }
+    }
+
+    public static void showItems(Connection postGresConn){
         if(postGresConn == null) {
             System.out.println("We should never get here.");
             return;
@@ -142,7 +167,11 @@ public class photoRENT {
         ResultSet rs = null ;
         try {
             stmt = postGresConn.createStatement();
-            rs = stmt.executeQuery("DELETE FROM juba5766.Rentable_item WHERE Id = " + Integer.toString(itemId));
+            rs = stmt.executeQuery("SELECT Serial_number, Price_per_day, Item_name, Item_type from juba5766.Rentable_item");
+            System.out.println("Serial_number" + "\t|\t" + "Price_per_day" + "\t|\t" + "Item_name" + "\t|\t Item_type");
+            while (rs.next()){
+                System.out.println(rs.getString("Serial_number") + "\t|\t" + rs.getFloat("Price_per_day") + "\t|\t" + rs.getString("Item_name") + "\t|\t" + rs.getString("Item_type"));
+            }
         }
         catch (SQLException e) {
             System.out.println("SQL Error!");
@@ -162,7 +191,7 @@ public class photoRENT {
         }
     }
 
-    public static void searchCameraByName(Connection postGresConn, string searchString)
+    public static void searchCameraByName(Connection postGresConn, String searchString)
     {
         if(postGresConn == null) {
             System.out.println("We should never get here.");
@@ -197,7 +226,7 @@ public class photoRENT {
         }
     }
 
-    public static void setItemReturned(Connection postGresConn, Date date_returned, int rent_num)
+    public static void setItemReturned(Connection postGresConn, String date_returned, int rent_num)
     {
         if(postGresConn == null) {
             System.out.println("We should never get here.");
@@ -205,10 +234,9 @@ public class photoRENT {
         }
 
         Statement stmt = null ;
-        ResultSet rs = null ;
         try {
             stmt = postGresConn.createStatement();
-            rs = stmt.executeQuery("UPDATE juba5766.Rent SET Date_returned = '" + date +"' WHERE Rent_number = " + rent_num);
+            stmt.executeUpdate("UPDATE juba5766.Rent SET Date_returned = to_Date('" + date_returned +"', 'yyyy/mm/dd') WHERE Rent_number = " + rent_num);
         }
         catch (SQLException e) {
             System.out.println("SQL Error!");
@@ -216,8 +244,6 @@ public class photoRENT {
         }
         finally {
             try {
-                if(null != rs)
-                    rs.close() ;
                 if(null != stmt)
                     stmt.close() ;
             }
@@ -302,15 +328,15 @@ public class photoRENT {
             System.out.println("We should never get here.");
             return;
         }
-
+        System.out.println(id);
         Statement stmt = null ;
         ResultSet rs = null ;
         try {
             stmt = postGresConn.createStatement();
-            rs = stmt.executeQuery("SELECT Serial_number, Name, Date_taken, Return_date FROM juba5766.Taken_cameras WHERE Customer = "+ id +
-                    " UNION SELECT Serial_number, Name, Date_taken, Return_date FROM juba5766.Taken_lenses WHERE Customer = "+ id );
+            rs = stmt.executeQuery("SELECT Serial_number, Name, Date_taken, Return_date FROM juba5766.Taken_cameras WHERE Customer = "+ Integer.toString(id) +
+                    " UNION SELECT Serial_number, Name, Date_taken, Return_date FROM juba5766.Taken_lenses WHERE Customer = "+ Integer.toString(id) );
             while (rs.next()){
-                System.out.println(rs.getInt("Serial_number") + "\t|\t" + rs.getString("Name") + rs.getDate("Date_taken") + "\t|\t" + rs.getDate("Return_date"));
+                System.out.println(rs.getInt("Serial_number") + "\t|\t" + rs.getString("Name").toString()  + "\t|\t" + rs.getDate("Date_taken").toString() + "\t|\t" + rs.getDate("Return_date").toString());
             }
         }
         catch (SQLException e) {
@@ -331,7 +357,7 @@ public class photoRENT {
         }
     }
 
-    public static void viewCameraInfo(Connection postGresConn, string camName)
+    public static void viewCameraInfo(Connection postGresConn, String camName)
     {
         if(postGresConn == null) {
             System.out.println("We should never get here.");
@@ -367,65 +393,51 @@ public class photoRENT {
     }
 
 
-    static int askCustomer(){
-        System.out.println("Enter 1 to VIEW cameras available for rent");
-        System.out.println("Enter 2 to VIEW lenses available for rent");
-        System.out.println("Enter 3 to VIEW your taken items");
-        System.out.println("Enter 4 to VIEW information about specific camera");
-        System.out.println("Enter 5 to ");
-        System.out.println("Enter 6 to ");
-
-        switch (scanner.nextInt()){
-            case CustomerActions.AVAILABLE_CAMERAS:
-                return 1;
-            case CustomerActions.AVAILABLE_LENSES:
-                return 2;
-            case CustomerActions.ITEMS_TAKEN_BY:
-                return 3;
-            case CustomerActions.CAMERA_INFO:
-                return 4;
-            default:
-                System.out.println("Wrong key entered, try again");
-                return askCustomer();
+    static Customer getCustomer(){
+        String email = "", phone_number="", fname="", lname="";
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        try
+        {
+            System.out.println("Please enter your First name: ");
+            fname = bufferedReader.readLine();
+            System.out.println("Please enter your Last name: ");
+            lname = bufferedReader.readLine();
+            System.out.println("Please enter your email: ");
+            email = bufferedReader.readLine();
+            System.out.println("Please enter your phone number: ");
+            phone_number = bufferedReader.readLine();
         }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+        Customer customer = new Customer(fname, lname, email, phone_number);
+        return customer;
     }
 
-    static int askEmployee(){
-        System.out.println("Enter 1 to VIEW cameras available for rent");
-        System.out.println("Enter 2 to VIEW lenses available for rent");
-        System.out.println("Enter 3 to VIEW taken items");
-        System.out.println("Enter 4 to VIEW information about specific camera");
-        System.out.println("Enter 5 to REGISTER new customer");
-        System.out.println("Enter 6 to REGISTER new camera");
-        System.out.println("Enter 7 to REGISTER new lens");
-        System.out.println("Enter 8 to REMOVE an item");
-        System.out.println("Enter 9 to REGISTER new Rent of an item");
-/*
-        switch (scanner.nextInt()){
-            case EmployeeActions.AVAILABLE_CAMERAS:
-                return 1;
-            case EmployeeActions.AVAILABLE_LENSES:
-                return 2;
-            case EmployeeActions.TAKEN_ITEMS:
-                return 3;
-            case EmployeeActions.CAMERA_INFO:
-                return 4;
-            case EmployeeActions.REGISTER_CUSTOMER:
-                return 5;
-            case EmployeeActions.REGISTER_CAMERA:
-                return 6;
-            case EmployeeActions.REGISTER_LENS:
-                return 7;
-            case EmployeeActions.REMOVE_ITEM:
-                return 8;
-            case EmployeeActions.REGISTER_RENT:
-                return 9;
-            default:
-                System.out.println("Wrong key entered, try again");
-                return askCustomer();
-        }*/
+    static CustomerActions askCustomer(){
+        System.out.println("Enter 0 to VIEW cameras available for rent");
+        System.out.println("Enter 1 to VIEW lenses available for rent");
+        System.out.println("Enter 2 to VIEW your taken items");
+        System.out.println("Enter 3 to VIEW information about specific camera");
+
         int choice = scanner.nextInt();
-        return choice <= EmployeeActions.values().length && choice > 0 ? (int)EmployeeActions.values()[choice] : askCustomer();
+        return choice <= CustomerActions.values().length && choice >= 0 ? CustomerActions.values()[choice] : askCustomer();
+    }
+
+    static EmployeeActions askEmployee(){
+        System.out.println("Enter 0 to VIEW cameras available for rent");
+        System.out.println("Enter 1 to VIEW lenses available for rent");
+        System.out.println("Enter 2 to VIEW taken items");
+        System.out.println("Enter 3 to VIEW information about specific camera");
+        System.out.println("Enter 4 to REGISTER new customer");
+        System.out.println("Enter 5 to REGISTER new camera");
+        System.out.println("Enter 6 to REGISTER new lens");
+        System.out.println("Enter 7 to REMOVE an item");
+        System.out.println("Enter 8 to REGISTER new Rent of an item");
+        System.out.println("Enter 9 to SEARCH for camera");
+
+        int choice = scanner.nextInt();
+        return choice <= EmployeeActions.values().length && choice >= 0 ? EmployeeActions.values()[choice] : askEmployee();
     }
 
     static boolean askForType()
@@ -457,12 +469,25 @@ public class photoRENT {
 			phone = bufferedReader.readLine();
 		}
 		catch(IOException e){
-			System.out.println("Please enter your phone number: ");
+			e.printStackTrace();
 		}
 
         return getId(postGresConn, mail, phone);
     }
 
+    static String askCameraName(){
+        String name ="";
+        System.out.println("Please enter camera name: ");
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        try
+        {
+            name = bufferedReader.readLine();
+        }
+        catch(IOException e){
+            System.out.println("Please enter your phone number: ");
+        }
+        return name;
+    }
 
     static int getId(Connection postGresConn, String email, String phone)
     {
@@ -471,6 +496,7 @@ public class photoRENT {
             return -1;
         }
 
+        int id = -1;
         Statement stmt = null;
         ResultSet rs = null;
         try
@@ -478,7 +504,7 @@ public class photoRENT {
             stmt = postGresConn.createStatement();
             rs = stmt.executeQuery("SELECT Id FROM juba5766.Customer WHERE Email = '" + email + "' AND Phone_number = '" + phone + "' ");
             while (rs.next()){
-                System.out.println(rs.getInt("Id"));
+                id = rs.getInt("Id");
             }
         }
         catch (SQLException e) {
@@ -497,7 +523,35 @@ public class photoRENT {
                 exp.printStackTrace();
             }
         }
-        return -1;
+        return id;
+    }
+
+    public static String getSerial(){
+        String serial ="";
+        System.out.println("Please enter serial number ");
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        try
+        {
+            serial = bufferedReader.readLine();
+        }
+        catch(IOException e){
+            System.out.println("Please enter your phone number: ");
+        }
+        return serial;
+    }
+
+    public static String getSearchString(){
+        String searchString ="";
+        System.out.println("Please enter camera you want to search for");
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        try
+        {
+            searchString = bufferedReader.readLine();
+        }
+        catch(IOException e){
+            System.out.println("Please enter your phone number: ");
+        }
+        return searchString;
     }
 
     /********************************************************/
@@ -510,29 +564,60 @@ public class photoRENT {
 
         if(isCustomer){
             customerId = getCustomerId(con);
+            System.out.println(customerId);
             switch (askCustomer()){
-                case CustomerActions.AVAILABLE_CAMERAS:
+                case AVAILABLE_CAMERAS:
                     viewAvailableCameras(con);
                     break;
-                case CustomerActions.AVAILABLE_LENSES:
+                case AVAILABLE_LENSES:
                     viewAvailableLenses(con);
                     break;
-                case CustomerActions.ITEMS_TAKEN_BY:
+                case ITEMS_TAKEN_BY:
                     viewItemsTakenBy(con, customerId);
                     break;
-                case CustomerActions.CAMERA_INFO:
-                    //viewCameraInfo(con, askCameraName());
+                case CAMERA_INFO:
+                    viewCameraInfo(con, askCameraName());
                     break;
                 default:
+                    System.out.println("NO CORRESPONDING ACTION FOUND");
                     break;
             }
         }else{
-            askEmployee();
+            switch (askEmployee()) {
+                case AVAILABLE_CAMERAS:
+                    viewAvailableCameras(con);
+                    break;
+                case AVAILABLE_LENSES:
+                    viewAvailableLenses(con);
+                    break;
+                case TAKEN_ITEMS:
+                    viewItemsTakenBy(con, customerId);
+                    break;
+                case CAMERA_INFO:
+                    viewCameraInfo(con, askCameraName());
+                    break;
+                case REGISTER_CUSTOMER:
+                    registerCustomer(con, getCustomer());
+                    break;
+                case REGISTER_CAMERA:
+                    break;
+                case REGISTER_LENS:
+                    break;
+                case REMOVE_ITEM:
+                    showItems(con);
+                    removeItem(con, getSerial());
+                    break;
+                case REGISTER_RENT:
+                    break;
+                case SEARCH_CAMERA:
+                    searchCameraByName(con, getSearchString());
+                    break;
+                default:
+                    System.out.println("NO CORRESPONDING ACTION FOUND");
+                    break;
+            }
         }
-        if( null != con ) {
-            int nofBooks = countBooks(con);
-            System.out.println("Number of lenses: " + nofBooks);
-        }
+
         if( null != con ) {
             try {
                 con.close() ;
