@@ -32,7 +32,8 @@ public class photoRENT {
         REGISTER_LENS,
         REMOVE_ITEM,
         REGISTER_RENT,
-        SEARCH_CAMERA
+        SEARCH_CAMERA,
+        SET_RETURNED
     }
 
     /********************************************************/
@@ -109,6 +110,7 @@ public class photoRENT {
         System.out.println("Enter 7 to REMOVE an item");
         System.out.println("Enter 8 to REGISTER new Rent of an item");
         System.out.println("Enter 9 to SEARCH for camera");
+        System.out.println("Enter 10 to set item returned");
 
         int choice = scanner.nextInt();
         return choice <= EmployeeActions.values().length && choice >= 0 ? EmployeeActions.values()[choice] : askEmployee();
@@ -146,7 +148,7 @@ public class photoRENT {
 			e.printStackTrace();
 		}
 
-        return getId(postGresConn, mail, phone);
+        return _SQLExecutor.getId(postGresConn, mail, phone);
     }
 
     static String askCameraName(){
@@ -158,14 +160,14 @@ public class photoRENT {
             name = bufferedReader.readLine();
         }
         catch(IOException e){
-            System.out.println("Please enter your phone number: ");
+            e.printStackTrace();
         }
         return name;
     }
 
-    public String takeCare(String toTake){
+    public static String takeCare(String toTake){
         toTake = "Visurtoks" + toTake;
-        return toTake+"("+Integer.231.toString()+")";
+        return toTake+"("+Integer.toString(231)+")";
     }
 
     public static String getSerial(){
@@ -177,7 +179,7 @@ public class photoRENT {
             serial = bufferedReader.readLine();
         }
         catch(IOException e){
-            System.out.println("Please enter your phone number: ");
+            e.printStackTrace();
         }
         return serial;
     }
@@ -191,7 +193,35 @@ public class photoRENT {
             searchString = bufferedReader.readLine();
         }
         catch(IOException e){
-            System.out.println("Please enter your phone number: ");
+            e.printStackTrace();
+        }
+        return searchString;
+    }
+
+    public static String askDate(){
+        String searchString ="";
+        System.out.println("Please enter date of return (yyyy/mm/dd)");
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        try
+        {
+            searchString = bufferedReader.readLine();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+        return searchString;
+    }
+
+    public static String askNum(){
+        String searchString ="";
+        System.out.println("Please enter item id from table above");
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        try
+        {
+            searchString = bufferedReader.readLine();
+        }
+        catch(IOException e){
+            e.printStackTrace();
         }
         return searchString;
     }
@@ -203,59 +233,72 @@ public class photoRENT {
         Connection con = getConnection(takeCare(args[0]), args[1]);
         boolean isCustomer = askForType();
         int customerId = -1;
+        boolean keepAsking = true;
 
         if(isCustomer){
             customerId = getCustomerId(con);
-            switch (askCustomer()){
-                case AVAILABLE_CAMERAS:
-                    _SQLExecutor.viewAvailableCameras(con);
-                    break;
-                case AVAILABLE_LENSES:
-                    _SQLExecutor.viewAvailableLenses(con);
-                    break;
-                case ITEMS_TAKEN_BY:
-                    _SQLExecutor.viewItemsTakenBy(con, customerId);
-                    break;
-                case CAMERA_INFO:
-                    _SQLExecutor.viewCameraInfo(con, askCameraName());
-                    break;
-                default:
-                    System.out.println("NO CORRESPONDING ACTION FOUND");
-                    break;
+            while(keepAsking){
+                switch (askCustomer()){
+                    case AVAILABLE_CAMERAS:
+                        _SQLExecutor.viewAvailableCameras(con);
+                        break;
+                    case AVAILABLE_LENSES:
+                        _SQLExecutor.viewAvailableLenses(con);
+                        break;
+                    case ITEMS_TAKEN_BY:
+                        _SQLExecutor.viewItemsTakenBy(con, customerId);
+                        break;
+                    case CAMERA_INFO:
+                        _SQLExecutor.viewCameraInfo(con, askCameraName());
+                        break;
+                    default:
+                        System.out.println("NO CORRESPONDING ACTION FOUND");
+                        System.out.println("exiting...");
+                        keepAsking = false;
+                        break;
+                }
             }
         }else{
-            switch (askEmployee()) {
-                case AVAILABLE_CAMERAS:
-                    _SQLExecutor.viewAvailableCameras(con);
-                    break;
-                case AVAILABLE_LENSES:
-                    _SQLExecutor.viewAvailableLenses(con);
-                    break;
-                case TAKEN_ITEMS:
-                    _SQLExecutor.viewItemsTakenBy(con, customerId);
-                    break;
-                case CAMERA_INFO:
-                    _SQLExecutor.viewCameraInfo(con, askCameraName());
-                    break;
-                case REGISTER_CUSTOMER:
-                    _SQLExecutor.registerCustomer(con, getCustomer());
-                    break;
-                case REGISTER_CAMERA:
-                    break;
-                case REGISTER_LENS:
-                    break;
-                case REMOVE_ITEM:
-                    _SQLExecutor.showItems(con);
-                    _SQLExecutor.removeItem(con, getSerial());
-                    break;
-                case REGISTER_RENT:
-                    break;
-                case SEARCH_CAMERA:
-                    _SQLExecutor.searchCameraByName(con, getSearchString());
-                    break;
-                default:
-                    System.out.println("NO CORRESPONDING ACTION FOUND");
-                    break;
+            while (keepAsking){
+                switch (askEmployee()) {
+                    case AVAILABLE_CAMERAS:
+                        _SQLExecutor.viewAvailableCameras(con);
+                        break;
+                    case AVAILABLE_LENSES:
+                        _SQLExecutor.viewAvailableLenses(con);
+                        break;
+                    case TAKEN_ITEMS:
+                        _SQLExecutor.viewItemsTakenBy(con, customerId);
+                        break;
+                    case CAMERA_INFO:
+                        _SQLExecutor.viewCameraInfo(con, askCameraName());
+                        break;
+                    case REGISTER_CUSTOMER: // INSERT: works
+                        _SQLExecutor.registerCustomer(con, getCustomer());
+                        break;
+                    case REGISTER_CAMERA:
+                        break;
+                    case REGISTER_LENS:
+                        break;
+                    case REMOVE_ITEM: // DELETE:
+                        _SQLExecutor.showItems(con);
+                        _SQLExecutor.removeItem(con, getSerial());
+                        break;
+                    case REGISTER_RENT:
+                        break;
+                    case SEARCH_CAMERA:// SELECT: works
+                        _SQLExecutor.searchCameraByName(con, getSearchString());
+                        break;
+                    case SET_RETURNED: // UPDATE: works
+                        _SQLExecutor.viewTakenItems(con);
+                        _SQLExecutor.setItemReturned(con, askDate(), askNum());
+                        break;
+                    default:
+                        System.out.println("NO CORRESPONDING ACTION FOUND");
+                        System.out.println("exiting...");
+                        keepAsking = false;
+                        break;
+                }
             }
         }
 

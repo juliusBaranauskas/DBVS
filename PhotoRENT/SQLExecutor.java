@@ -9,7 +9,7 @@ import java.util.Date.*;
 import java.sql.Date.*;
 
 
-public static class SQLExecutor{
+public class SQLExecutor{
 
     public static void registerCustomer(Connection postGresConn, Customer customer)
     {
@@ -51,6 +51,7 @@ public static class SQLExecutor{
         try {
             stmt = postGresConn.createStatement();
             stmt.executeUpdate("DELETE FROM juba5766.Rentable_item WHERE Id = " + itemId);
+            System.out.println("tipo dleet" + itemId);
         }
         catch (SQLException e) {
             System.out.println("SQL Error!");
@@ -113,7 +114,7 @@ public static class SQLExecutor{
         ResultSet rs = null ;
         try {
             stmt = postGresConn.createStatement();
-            rs = stmt.executeQuery("SELECT Name, Brand, Model, MP_count, Lens_mount_type, MemCard_slot from juba5766.Camera WHERE Name LIKE '%" + searchString + "%'");
+            rs = stmt.executeQuery("SELECT Name, Brand, Model, MP_count, Lens_mount_type, MemCard_slot from juba5766.Camera WHERE lower(Name) LIKE lower('%" + searchString + "%')");
             while (rs.next()){
                 System.out.println(rs.getString("Name") + "\t|\t" + rs.getString("Brand") + "\t|\t" + rs.getString("Model") + "\t|\t" + rs.getFloat("MP_count") + "\t|\t" +
                         rs.getString("Lens_mount_type") + "\t|\t" +rs.getString("MemCard_slot"));
@@ -137,7 +138,7 @@ public static class SQLExecutor{
         }
     }
 
-    public static void setItemReturned(Connection postGresConn, String date_returned, int rent_num)
+    public static void setItemReturned(Connection postGresConn, String date_returned, String rent_num)
     {
         if(postGresConn == null) {
             System.out.println("We should never get here.");
@@ -248,6 +249,40 @@ public static class SQLExecutor{
                     " UNION SELECT Serial_number, Name, Date_taken, Return_date FROM juba5766.Taken_lenses WHERE Customer = "+ Integer.toString(id) );
             while (rs.next()){
                 System.out.println(rs.getInt("Serial_number") + "\t|\t" + rs.getString("Name").toString()  + "\t|\t" + rs.getDate("Date_taken").toString() + "\t|\t" + rs.getDate("Return_date").toString());
+            }
+        }
+        catch (SQLException e) {
+            System.out.println("SQL Error!");
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                if(null != rs)
+                    rs.close() ;
+                if(null != stmt)
+                    stmt.close() ;
+            }
+            catch (SQLException exp) {
+                System.out.println("Unexpected SQL Error!");
+                exp.printStackTrace();
+            }
+        }
+    }
+
+    public static void viewTakenItems(Connection postGresConn)
+    {
+        if(postGresConn == null) {
+            System.out.println("We should never get here.");
+            return;
+        }
+        Statement stmt = null ;
+        ResultSet rs = null ;
+        try {
+            stmt = postGresConn.createStatement();
+            rs = stmt.executeQuery("SELECT Date_taken, Return_date, Date_returned, Rent_number FROM juba5766.Rent WHERE Date_returned IS NULL");
+            System.out.println("Date_taken" + "\t|\t" + "Return_date"  + "\t|\t" + "Rent_number");
+            while (rs.next()){
+                System.out.println(rs.getDate("Date_taken").toString() + "\t|\t" + rs.getDate("Return_date").toString()  + "\t|\t" + rs.getInt("Rent_number"));
             }
         }
         catch (SQLException e) {
