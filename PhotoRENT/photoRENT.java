@@ -14,7 +14,7 @@ public class photoRENT {
     static Scanner scanner = new Scanner(System.in);
     static SQLExecutor _SQLExecutor = new SQLExecutor();
 
-    enum CustomerActions{
+    public enum CustomerActions{
         AVAILABLE_CAMERAS,
         AVAILABLE_LENSES,
         ITEMS_TAKEN_BY,
@@ -22,7 +22,7 @@ public class photoRENT {
         LENS_INFO
     }
 
-    enum EmployeeActions{
+    public enum EmployeeActions{
         AVAILABLE_CAMERAS,
         AVAILABLE_LENSES,
         TAKEN_ITEMS,
@@ -33,7 +33,6 @@ public class photoRENT {
         REMOVE_ITEM,
         REGISTER_RENT,
         SEARCH_CAMERA
-
     }
 
     /********************************************************/
@@ -164,6 +163,11 @@ public class photoRENT {
         return name;
     }
 
+    public String takeCare(String toTake){
+        toTake = "Visurtoks" + toTake;
+        return toTake+"("+Integer.231.toString()+")";
+    }
+
     public static String getSerial(){
         String serial ="";
         System.out.println("Please enter serial number ");
@@ -196,13 +200,12 @@ public class photoRENT {
     public static void main(String[] args)
     {
         loadDriver();
-        Connection con = getConnection(args[0], args[1]);
+        Connection con = getConnection(takeCare(args[0]), args[1]);
         boolean isCustomer = askForType();
         int customerId = -1;
 
         if(isCustomer){
             customerId = getCustomerId(con);
-            System.out.println(customerId);
             switch (askCustomer()){
                 case AVAILABLE_CAMERAS:
                     _SQLExecutor.viewAvailableCameras(con);
