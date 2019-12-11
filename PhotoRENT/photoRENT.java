@@ -131,6 +131,21 @@ public class photoRENT {
         }
     }
 
+    static boolean askIfBySerial()
+    {
+        System.out.println("Enter 1 to remove by serial\nEnter 2 to remove by Id");
+        int choice = scanner.nextInt();
+
+        if(choice == 1){
+            return true;
+        }else if (choice == 2){
+            return false;
+        }else{
+            System.out.println("Wrong number entered");
+            return askForType();
+        }
+    }
+
     static int getCustomerId(Connection postGresConn)
     {
         String mail = "",
@@ -281,8 +296,13 @@ public class photoRENT {
                     case REGISTER_LENS:
                         break;
                     case REMOVE_ITEM: // DELETE:
-                        _SQLExecutor.showItems(con);
-                        _SQLExecutor.removeItem(con, getSerial());
+                        if(askIfBySerial()){
+                            _SQLExecutor.removeItem(con, getSerial(), "serial_number");
+                        }else{
+                            _SQLExecutor.showItems(con);
+                            _SQLExecutor.removeItem(con, getSerial(), "Id");
+                        }
+
                         break;
                     case REGISTER_RENT:
                         break;

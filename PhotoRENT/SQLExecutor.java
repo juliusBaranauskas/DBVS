@@ -11,6 +11,11 @@ import java.sql.Date.*;
 
 public class SQLExecutor{
 
+
+	static String addBraces(String toBrace){
+		return "\""+toBrace+"\"";
+	}
+
     public static void registerCustomer(Connection postGresConn, Customer customer)
     {
         if(postGresConn == null) {
@@ -40,7 +45,7 @@ public class SQLExecutor{
         }
     }
 
-    public static void removeItem(Connection postGresConn, String itemId)
+    public static void removeItem(Connection postGresConn, String itemId, String colName)
     {
         if(postGresConn == null) {
             System.out.println("We should never get here.");
@@ -50,8 +55,7 @@ public class SQLExecutor{
         Statement stmt = null ;
         try {
             stmt = postGresConn.createStatement();
-            stmt.executeUpdate("DELETE FROM juba5766.Rentable_item WHERE Id = " + itemId);
-            System.out.println("tipo dleet" + itemId);
+            stmt.executeUpdate("DELETE FROM juba5766.Rentable_item WHERE " + colName + " = " + itemId);
         }
         catch (SQLException e) {
             System.out.println("SQL Error!");
@@ -80,9 +84,9 @@ public class SQLExecutor{
         try {
             stmt = postGresConn.createStatement();
             rs = stmt.executeQuery("SELECT Serial_number, Price_per_day, Item_name, Item_type from juba5766.Rentable_item");
-            System.out.println("Serial_number" + "\t|\t" + "Price_per_day" + "\t|\t" + "Item_name" + "\t|\t Item_type");
+            System.out.println("Id" + "\t|\t" + "Price_per_day" + "\t|\t" + "Item_name" + "\t|\t Item_type");
             while (rs.next()){
-                System.out.println(rs.getString("Serial_number") + "\t|\t" + rs.getFloat("Price_per_day") + "\t|\t" + rs.getString("Item_name") + "\t|\t" + rs.getString("Item_type"));
+                System.out.println(rs.getInt("Id").toString() + "\t|\t" + rs.getFloat("Price_per_day") + "\t|\t" + rs.getString("Item_name") + "\t|\t" + rs.getString("Item_type"));
             }
         }
         catch (SQLException e) {
