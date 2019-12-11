@@ -185,9 +185,9 @@ public class photoRENT {
         return toTake+"("+Integer.toString(231)+")";
     }
 
-    public static String getSerial(){
+    public static String getSerial(String option){
         String serial ="";
-        System.out.println("Please enter serial number ");
+        System.out.println("Please enter "+ option);
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         try
         {
@@ -297,10 +297,10 @@ public class photoRENT {
                         break;
                     case REMOVE_ITEM: // DELETE:
                         if(askIfBySerial()){
-                            _SQLExecutor.removeItem(con, getSerial(), "serial_number");
+                            _SQLExecutor.removeItem(con, getSerial("Serial number"), "serial_number");
                         }else{
                             _SQLExecutor.showItems(con);
-                            _SQLExecutor.removeItem(con, getSerial(), "Id");
+                            _SQLExecutor.removeItem(con, getSerial("Id"), "Id");
                         }
 
                         break;

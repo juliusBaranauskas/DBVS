@@ -83,10 +83,10 @@ public class SQLExecutor{
         ResultSet rs = null ;
         try {
             stmt = postGresConn.createStatement();
-            rs = stmt.executeQuery("SELECT Serial_number, Price_per_day, Item_name, Item_type from juba5766.Rentable_item");
+            rs = stmt.executeQuery("SELECT Id, Price_per_day, Item_name, Item_type from juba5766.Rentable_item");
             System.out.println("Id" + "\t|\t" + "Price_per_day" + "\t|\t" + "Item_name" + "\t|\t Item_type");
             while (rs.next()){
-                System.out.println(rs.getInt("Id").toString() + "\t|\t" + rs.getFloat("Price_per_day") + "\t|\t" + rs.getString("Item_name") + "\t|\t" + rs.getString("Item_type"));
+                System.out.println(rs.getInt("Id") + "\t|\t" + rs.getFloat("Price_per_day") + "\t|\t" + rs.getString("Item_name") + "\t|\t" + rs.getString("Item_type"));
             }
         }
         catch (SQLException e) {
