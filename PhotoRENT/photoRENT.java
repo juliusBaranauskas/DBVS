@@ -33,7 +33,8 @@ public class photoRENT {
         REMOVE_ITEM,
         REGISTER_RENT,
         SEARCH_CAMERA,
-        SET_RETURNED
+        SET_RETURNED,
+        ISSUE_ITEM
     }
 
     /********************************************************/
@@ -111,6 +112,7 @@ public class photoRENT {
         System.out.println("Enter 8 to REGISTER new Rent of an item");
         System.out.println("Enter 9 to SEARCH for camera");
         System.out.println("Enter 10 to set item returned");
+        System.out.println("Enter 11 to issue item");
 
         int choice = scanner.nextInt();
         return choice <= EmployeeActions.values().length && choice >= 0 ? EmployeeActions.values()[choice] : askEmployee();
@@ -296,6 +298,7 @@ public class photoRENT {
                     case REGISTER_LENS:
                         break;
                     case REMOVE_ITEM: // DELETE:
+
                         if(askIfBySerial()){
                             _SQLExecutor.removeItem(con, getSerial(), "serial_number");
                         }else{
@@ -312,6 +315,9 @@ public class photoRENT {
                     case SET_RETURNED: // UPDATE: works
                         _SQLExecutor.viewTakenItems(con);
                         _SQLExecutor.setItemReturned(con, askDate(), askNum());
+                        break;
+                    case ISSUE_ITEM:
+                        // askForRentDetails(): Rent (Date_taken, _return_date, Item, Customer)
                         break;
                     default:
                         System.out.println("NO CORRESPONDING ACTION FOUND");
