@@ -283,7 +283,7 @@ public class photoRENT {
                         _SQLExecutor.viewAvailableLenses(con);
                         break;
                     case TAKEN_ITEMS:
-                        _SQLExecutor.viewItemsTakenBy(con, customerId);
+                        _SQLExecutor.viewTakenItems(con);
                         break;
                     case CAMERA_INFO:
                         _SQLExecutor.viewCameraInfo(con, askCameraName());

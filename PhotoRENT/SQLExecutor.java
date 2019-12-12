@@ -11,11 +11,6 @@ import java.sql.Date.*;
 
 public class SQLExecutor{
 
-
-	static String addBraces(String toBrace){
-		return "\""+toBrace+"\"";
-	}
-
     public static void registerCustomer(Connection postGresConn, Customer customer)
     {
         if(postGresConn == null) {
@@ -244,7 +239,6 @@ public class SQLExecutor{
             System.out.println("We should never get here.");
             return;
         }
-        System.out.println(id);
         Statement stmt = null ;
         ResultSet rs = null ;
         try {
@@ -283,7 +277,7 @@ public class SQLExecutor{
         ResultSet rs = null ;
         try {
             stmt = postGresConn.createStatement();
-            rs = stmt.executeQuery("SELECT Date_taken, Return_date, Date_returned, Rent_number FROM juba5766.Rent WHERE Date_returned IS NULL");
+            rs = stmt.executeQuery("SELECT Date_taken, Return_date, Rent_number FROM juba5766.Rent WHERE Date_returned IS NULL");
             System.out.println("Date_taken" + "\t|\t" + "Return_date"  + "\t|\t" + "Rent_number");
             while (rs.next()){
                 System.out.println(rs.getDate("Date_taken").toString() + "\t|\t" + rs.getDate("Return_date").toString()  + "\t|\t" + rs.getInt("Rent_number"));

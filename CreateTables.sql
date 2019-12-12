@@ -119,7 +119,7 @@ CREATE OR REPLACE FUNCTION checkItemName() RETURNS TRIGGER AS $$
    BEGIN
 		IF NEW.Item_type = 'c' THEN
 			PERFORM checkCameraName(New.Item_name);
-		ELSIF Item_type = 'l' THEN
+		ELSIF NEW.Item_type = 'l' THEN
 			PERFORM checkLensName(New.Item_name);
 		ELSE	
 			RAISE EXCEPTION 'Item type does not exist in this database';
@@ -206,13 +206,13 @@ CREATE VIEW juba5766.Taken_lenses (Serial_number, Name, Date_taken, Return_date,
 		
 CREATE VIEW juba5766.Available_cameras(Name, "# of available")
 AS (SELECT Name, COUNT(*) AS "# of units"
-FROM juba5766.Rent JOIN Rentable_camera ON Rentable_camera.Id = Rent.Item
+FROM juba5766.Rentable_camera LEFT OUTER JOIN Rent ON Rentable_camera.Id = Rent.Item
 GROUP BY Name
 HAVING Count(Date_returned) = Count(Return_date));
 
 CREATE VIEW juba5766.Available_Lenses(Name, "# of available")
 AS (SELECT Name, COUNT(*) AS "# of units"  
-FROM juba5766.Rent JOIN Rentable_lens ON Rentable_lens.Id = Rent.Item
+FROM juba5766.Rentable_lens JOIN Rent ON Rentable_lens.Id = Rent.Item
 GROUP BY Name
 HAVING Count(Date_returned) = Count(Return_date));
 
