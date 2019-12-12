@@ -30,8 +30,6 @@ public class photoRENT {
         TAKEN_ITEMS,
         CAMERA_INFO,
         REGISTER_CUSTOMER,
-        REGISTER_CAMERA,
-        REGISTER_LENS,
         REMOVE_ITEM,
         REGISTER_RENT,
         SEARCH_CAMERA,
@@ -107,13 +105,11 @@ public class photoRENT {
         System.out.println("Enter 2 to VIEW taken items");
         System.out.println("Enter 3 to VIEW information about specific camera");
         System.out.println("Enter 4 to REGISTER new customer");
-        System.out.println("Enter 5 to REGISTER new camera");
-        System.out.println("Enter 6 to REGISTER new lens");
-        System.out.println("Enter 7 to REMOVE an item");
-        System.out.println("Enter 8 to REGISTER new Rent of an item");
-        System.out.println("Enter 9 to SEARCH for camera");
-        System.out.println("Enter 10 to set item returned");
-        System.out.println("Enter 11 to issue item");
+        System.out.println("Enter 5 to REMOVE an item");
+        System.out.println("Enter 6 to REGISTER new Rent of an item");
+        System.out.println("Enter 7 to SEARCH for camera");
+        System.out.println("Enter 8 to set item returned");
+        System.out.println("Enter 9 to issue item");
 
         int choice = scanner.nextInt();
         return choice <= EmployeeActions.values().length && choice >= 0 ? EmployeeActions.values()[choice] : askEmployee();
@@ -151,7 +147,7 @@ public class photoRENT {
 
     static boolean askIfCamera()
     {
-        System.out.println("Enter 1 if it's a camera\nEnter 2 to if it's lens");
+        System.out.println("Enter 1 if it's a camera\nEnter 2 if it's lens");
         int choice = scanner.nextInt();
 
         if(choice == 1){
@@ -315,16 +311,12 @@ public class photoRENT {
                     case REGISTER_CUSTOMER: // INSERT: works
                         _SQLExecutor.registerCustomer(con, getCustomer());
                         break;
-                    case REGISTER_CAMERA:
-                        break;
-                    case REGISTER_LENS:
-                        break;
                     case REMOVE_ITEM: // DELETE:
                         if(askIfBySerial()){
-                            _SQLExecutor.removeItem(con, getSerial(), true, askIfCamera());
+                            _SQLExecutor.removeItem(con, getSerial("serial_number"), true, askIfCamera());
                         }else{
                             _SQLExecutor.showItems(con);
-                            _SQLExecutor.removeItem(con, getSerial(), false, false);
+                            _SQLExecutor.removeItem(con, getSerial("item Id"), false, false);
                         }
                         break;
                     case REGISTER_RENT:
