@@ -205,10 +205,10 @@ public class photoRENT {
         return toTake+"("+Integer.toString(231)+")";
     }
 
-    public static String getSerial()
+    public static String getSerial(String option)
     {
         String serial ="";
-        System.out.println("Please enter serial number ");
+        System.out.println("Please enter "+ option);
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         try
         {
@@ -320,14 +320,12 @@ public class photoRENT {
                     case REGISTER_LENS:
                         break;
                     case REMOVE_ITEM: // DELETE:
-
                         if(askIfBySerial()){
                             _SQLExecutor.removeItem(con, getSerial(), true, askIfCamera());
                         }else{
                             _SQLExecutor.showItems(con);
-                            _SQLExecutor.removeItem(con, getSerial(), false);
+                            _SQLExecutor.removeItem(con, getSerial(), false, false);
                         }
-
                         break;
                     case REGISTER_RENT:
                         break;
