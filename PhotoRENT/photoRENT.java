@@ -14,7 +14,8 @@ public class photoRENT {
     static Scanner scanner = new Scanner(System.in);
     static SQLExecutor _SQLExecutor = new SQLExecutor();
 
-    public enum CustomerActions{
+    public enum CustomerActions
+    {
         AVAILABLE_CAMERAS,
         AVAILABLE_LENSES,
         ITEMS_TAKEN_BY,
@@ -22,7 +23,8 @@ public class photoRENT {
         LENS_INFO
     }
 
-    public enum EmployeeActions{
+    public enum EmployeeActions
+    {
         AVAILABLE_CAMERAS,
         AVAILABLE_LENSES,
         TAKEN_ITEMS,
@@ -37,7 +39,6 @@ public class photoRENT {
         ISSUE_ITEM
     }
 
-    /********************************************************/
     public static void loadDriver()
     {
         try {
@@ -49,7 +50,7 @@ public class photoRENT {
             System.exit(1);
         }
     }
-    /********************************************************/
+
     public static Connection getConnection(String conSetting, String conValidator)
     {
         Connection postGresConn = null;
@@ -65,11 +66,9 @@ public class photoRENT {
 
         return postGresConn ;
     }
-    /********************************************************/
 
-
-
-    static Customer getCustomer(){
+    static Customer getCustomer()
+    {
         String email = "", phone_number="", fname="", lname="";
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
         try
@@ -90,7 +89,8 @@ public class photoRENT {
         return customer;
     }
 
-    static CustomerActions askCustomer(){
+    static CustomerActions askCustomer()
+    {
         System.out.println("Enter 0 to VIEW cameras available for rent");
         System.out.println("Enter 1 to VIEW lenses available for rent");
         System.out.println("Enter 2 to VIEW your taken items");
@@ -100,7 +100,8 @@ public class photoRENT {
         return choice <= CustomerActions.values().length && choice >= 0 ? CustomerActions.values()[choice] : askCustomer();
     }
 
-    static EmployeeActions askEmployee(){
+    static EmployeeActions askEmployee()
+    {
         System.out.println("Enter 0 to VIEW cameras available for rent");
         System.out.println("Enter 1 to VIEW lenses available for rent");
         System.out.println("Enter 2 to VIEW taken items");
@@ -144,7 +145,22 @@ public class photoRENT {
             return false;
         }else{
             System.out.println("Wrong number entered");
-            return askForType();
+            return askIfBySerial();
+        }
+    }
+
+    static boolean askIfCamera()
+    {
+        System.out.println("Enter 1 if it's a camera\nEnter 2 to if it's lens");
+        int choice = scanner.nextInt();
+
+        if(choice == 1){
+            return true;
+        }else if (choice == 2){
+            return false;
+        }else{
+            System.out.println("Wrong number entered");
+            return askIfCamera();
         }
     }
 
@@ -168,7 +184,8 @@ public class photoRENT {
         return _SQLExecutor.getId(postGresConn, mail, phone);
     }
 
-    static String askCameraName(){
+    static String askCameraName()
+    {
         String name ="";
         System.out.println("Please enter camera name: ");
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
@@ -182,12 +199,14 @@ public class photoRENT {
         return name;
     }
 
-    public static String takeCare(String toTake){
+    public static String takeCare(String toTake)
+    {
         toTake = "Visurtoks" + toTake;
         return toTake+"("+Integer.toString(231)+")";
     }
 
-    public static String getSerial(){
+    public static String getSerial()
+    {
         String serial ="";
         System.out.println("Please enter serial number ");
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
@@ -201,7 +220,8 @@ public class photoRENT {
         return serial;
     }
 
-    public static String getSearchString(){
+    public static String getSearchString()
+    {
         String searchString ="";
         System.out.println("Please enter camera you want to search for");
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
@@ -215,7 +235,8 @@ public class photoRENT {
         return searchString;
     }
 
-    public static String askDate(){
+    public static String askDate()
+    {
         String searchString ="";
         System.out.println("Please enter date of return (yyyy/mm/dd)");
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
@@ -229,7 +250,8 @@ public class photoRENT {
         return searchString;
     }
 
-    public static String askNum(){
+    public static String askNum()
+    {
         String searchString ="";
         System.out.println("Please enter item id from table above");
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
@@ -285,7 +307,7 @@ public class photoRENT {
                         _SQLExecutor.viewAvailableLenses(con);
                         break;
                     case TAKEN_ITEMS:
-                        _SQLExecutor.viewItemsTakenBy(con, customerId);
+                        _SQLExecutor.viewTakenItems(con);
                         break;
                     case CAMERA_INFO:
                         _SQLExecutor.viewCameraInfo(con, askCameraName());
@@ -300,10 +322,10 @@ public class photoRENT {
                     case REMOVE_ITEM: // DELETE:
 
                         if(askIfBySerial()){
-                            _SQLExecutor.removeItem(con, getSerial(), "serial_number");
+                            _SQLExecutor.removeItem(con, getSerial(), true, askIfCamera());
                         }else{
                             _SQLExecutor.showItems(con);
-                            _SQLExecutor.removeItem(con, getSerial(), "Id");
+                            _SQLExecutor.removeItem(con, getSerial(), false);
                         }
 
                         break;
@@ -338,5 +360,4 @@ public class photoRENT {
             }
         }
     }
-    /********************************************************/
 }

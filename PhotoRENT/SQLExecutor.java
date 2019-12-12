@@ -11,11 +11,6 @@ import java.sql.Date.*;
 
 public class SQLExecutor{
 
-
-	static String addBraces(String toBrace){
-		return "\""+toBrace+"\"";
-	}
-
     public static void registerCustomer(Connection postGresConn, Customer customer)
     {
         if(postGresConn == null) {
@@ -45,7 +40,7 @@ public class SQLExecutor{
         }
     }
 
-    public static void removeItem(Connection postGresConn, String itemId, String colName)
+    public static void removeItem(Connection postGresConn, String itemId, boolean bySerial, boolean isCamera)
     {
         if(postGresConn == null) {
             System.out.println("We should never get here.");
@@ -53,9 +48,22 @@ public class SQLExecutor{
         }
 
         Statement stmt = null ;
+        ResultSet rs = null;
         try {
             stmt = postGresConn.createStatement();
-            stmt.executeUpdate("DELETE FROM juba5766.Rentable_item WHERE " + colName + " = " + itemId);
+            if(bySerial){
+                if(isCamera){
+                    rs = stmt.executeQuery("SELECT Id FROM Rentable_camera WHERE Serial_number = " + itemId);
+                }else{
+                    rs = stmt.executeQuery("SELECT Id FROM Rentable_lens WHERE Serial_number = " + itemId);
+                }
+                if(rs.next()){
+                    stmt.executeUpdate("DELETE FROM juba5766.Rentable_item WHERE Id = " + rs.getInt("Id"));
+                }
+            }else{
+                stmt.executeUpdate("DELETE FROM juba5766.Rentable_item WHERE Id = " + itemId);
+            }
+
         }
         catch (SQLException e) {
             System.out.println("SQL Error!");
@@ -73,7 +81,8 @@ public class SQLExecutor{
         }
     }
 
-    public static void showItems(Connection postGresConn){
+    public static void showItems(Connection postGresConn)
+    {
         if(postGresConn == null) {
             System.out.println("We should never get here.");
             return;
@@ -244,7 +253,6 @@ public class SQLExecutor{
             System.out.println("We should never get here.");
             return;
         }
-        System.out.println(id);
         Statement stmt = null ;
         ResultSet rs = null ;
         try {
@@ -283,7 +291,7 @@ public class SQLExecutor{
         ResultSet rs = null ;
         try {
             stmt = postGresConn.createStatement();
-            rs = stmt.executeQuery("SELECT Date_taken, Return_date, Date_returned, Rent_number FROM juba5766.Rent WHERE Date_returned IS NULL");
+            rs = stmt.executeQuery("SELECT Date_taken, Return_date, Rent_number FROM juba5766.Rent WHERE Date_returned IS NULL");
             System.out.println("Date_taken" + "\t|\t" + "Return_date"  + "\t|\t" + "Rent_number");
             while (rs.next()){
                 System.out.println(rs.getDate("Date_taken").toString() + "\t|\t" + rs.getDate("Return_date").toString()  + "\t|\t" + rs.getInt("Rent_number"));
