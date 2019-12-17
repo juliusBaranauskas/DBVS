@@ -305,7 +305,7 @@ public class photoRENT {
                     case TAKEN_ITEMS:
                         _SQLExecutor.viewTakenItems(con);
                         break;
-                    case REGISTER_CUSTOMER: // INSERT: works
+                    case REGISTER_CUSTOMER: // INSERT:
                         _SQLExecutor.registerCustomer(con, getCustomer());
                         break;
                     case REMOVE_ITEM: // DELETE:
@@ -318,7 +318,7 @@ public class photoRENT {
                         break;
                     case REGISTER_RENT:
                         break;
-                    case SEARCH_CAMERA:// SELECT: works
+                    case SEARCH_CAMERA:// SELECT:
                         _SQLExecutor.searchCameraByName(con, getSearchString());
                         break;
                     case SET_RETURNED: // UPDATE: works
@@ -328,7 +328,7 @@ public class photoRENT {
                     case ISSUE_ITEM:
                         // askForRentDetails(): Rent (Date_taken, _return_date, Item, Customer)
                         break;
-                    case REGISTER_n_ISSUE:
+                    case REGISTER_n_ISSUE: // UPDATE, INSERT
                         _SQLExecutor.showItems(con);
                         _SQLExecutor.RegNissue(con, getCustomer(), getSerial("item Id"));
                         break;
