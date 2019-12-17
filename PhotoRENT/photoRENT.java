@@ -28,13 +28,13 @@ public class photoRENT {
         AVAILABLE_CAMERAS,
         AVAILABLE_LENSES,
         TAKEN_ITEMS,
-        CAMERA_INFO,
         REGISTER_CUSTOMER,
         REMOVE_ITEM,
         REGISTER_RENT,
         SEARCH_CAMERA,
         SET_RETURNED,
-        ISSUE_ITEM
+        ISSUE_ITEM,
+        REGISTER_n_ISSUE
     }
 
     public static void loadDriver()
@@ -103,13 +103,13 @@ public class photoRENT {
         System.out.println("Enter 0 to VIEW cameras available for rent");
         System.out.println("Enter 1 to VIEW lenses available for rent");
         System.out.println("Enter 2 to VIEW taken items");
-        System.out.println("Enter 3 to VIEW information about specific camera");
-        System.out.println("Enter 4 to REGISTER new customer");
-        System.out.println("Enter 5 to REMOVE an item");
-        System.out.println("Enter 6 to REGISTER new Rent of an item");
-        System.out.println("Enter 7 to SEARCH for camera");
-        System.out.println("Enter 8 to set item returned");
-        System.out.println("Enter 9 to issue item");
+        System.out.println("Enter 3 to REGISTER new customer");
+        System.out.println("Enter 4 to REMOVE an item");
+        System.out.println("Enter 5 to REGISTER new Rent of an item");
+        System.out.println("Enter 6 to SEARCH for camera");
+        System.out.println("Enter 7 to set item returned");
+        System.out.println("Enter 8 to issue item");
+        System.out.println("Enter 9 to return item and take another");
 
         int choice = scanner.nextInt();
         return choice <= EmployeeActions.values().length && choice >= 0 ? EmployeeActions.values()[choice] : askEmployee();
@@ -305,9 +305,6 @@ public class photoRENT {
                     case TAKEN_ITEMS:
                         _SQLExecutor.viewTakenItems(con);
                         break;
-                    case CAMERA_INFO:
-                        _SQLExecutor.viewCameraInfo(con, askCameraName());
-                        break;
                     case REGISTER_CUSTOMER: // INSERT: works
                         _SQLExecutor.registerCustomer(con, getCustomer());
                         break;
@@ -330,6 +327,10 @@ public class photoRENT {
                         break;
                     case ISSUE_ITEM:
                         // askForRentDetails(): Rent (Date_taken, _return_date, Item, Customer)
+                        break;
+                    case REGISTER_n_ISSUE:
+                        _SQLExecutor.showItems(con);
+                        _SQLExecutor.RegNissue(con, getCustomer(), getSerial("item Id"));
                         break;
                     default:
                         System.out.println("NO CORRESPONDING ACTION FOUND");

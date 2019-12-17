@@ -386,4 +386,41 @@ public class SQLExecutor{
         }
         return id;
     }
+
+    static void regNissue(Connection postGresConn, Customer customer, String itemId){
+
+        if(postGresConn == null) {
+            System.out.println("We should never get here.");
+            return;
+        }
+
+        Statement stmt = null ;
+        try {
+            postGresConn.setAutoCommit(false);
+            stmt = postGresConn.createStatement();
+            stmt.executeUpdate("INSERT INTO juba5766.Customer(First_name, Last_name, Email, Phone_number) " +
+                    "VALUES ('"+ customer.First_name +"', '"+ customer.Last_name +"', '"+ customer.Email +"', '"+ customer.Phone_number +"')");
+            int custId = this.getId(postGresConn, customer.Email, customer.Phone_number);
+            stmt.executeUpdate("INSERT INTO juba5766.Rent(Date_taken, Return_date, Date_returned, Item, Customer) VALUES(to_date('2019/11/25', 'yyyy/mm/dd'), to_date('2019/11/27', 'yyyy/mm/dd'), null, " + itemId +", "+ custId +")");
+            postGresConn.commit();
+            postGresConn.setAutoCommit(true);
+        }
+        catch (SQLException e) {
+            System.out.println("SQL Error!");
+            e.printStackTrace();
+            postGresConn.rollback();
+            postGresConn.setAutoCommit(true);
+        }
+        finally {
+            try {
+                if(null != stmt)
+                    stmt.close() ;
+            }
+            catch (SQLException exp) {
+                System.out.println("Unexpected SQL Error!");
+                exp.printStackTrace();
+            }
+        }
+
+    }
 }
